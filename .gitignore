@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+.ipynb_checkpoints/
+*.egg-info/
+.streamlit/
+streamlit_static/
+build/
+dist/
+*.log
