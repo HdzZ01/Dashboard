@@ -1,22 +1,19 @@
-1.1. Abrir o Terminal
-Abra o Prompt de Comando (Windows) ou PowerShell e navegue até a pasta do projeto:
+Dashboard desenvolvido para análise de performance operacional e perfil demográfico em ambiente hospitalar, focado em transformar dados brutos em indicadores estratégicos (KPIs).
 
-cd C:\Dash
+Funcionalidades por Eixo de Análise:
 
-1.2. Instalação Manual do Streamlit (Obrigatório)
-O único pacote que precisa ser instalado manualmente para que o script de instalação automática funcione corretamente é o próprio Streamlit.
+Operacional: Monitoramento de volume de atendimentos e identificação de picos sazonais através de séries históricas.
 
-pip install streamlit
+Recursos e Processos: Gestão de consumo de medicamentos e distribuição de serviços hospitalares.
 
-2. Execução da Dashboard
-Após instalar o Streamlit, o sistema de instalação automática do script cuidará do restante.
+Clínico: Processamento de Linguagem Natural (NLP) básico com Nuvem de Palavras para diagnósticos e queixas principais.
 
-2.1. Comando de Execução
-Execute o script Streamlit:
+Demográfico e Geográfico: Análise de faixa etária e mapeamento interativo de origem de pacientes via Folium.
 
-streamlit run app_dashboard.py
+Diferenciais Técnicos:
 
-2.2. O que Acontece
-Instalação Automática: Na primeira execução, o terminal mostrará diversas mensagens de instalação (Instalando pandas..., etc.). Isso é normal e garante que todas as bibliotecas (Plotly, WordCloud, Folium) estejam instaladas.
+Ambiente Autogerenciado: Script de verificação dinâmica que instala dependências ausentes automaticamente.
 
-Carregamento: Após a instalação, a dashboard será aberta automaticamente no seu navegador web padrão.
+Performance: Implementação de st.cache_data para otimização de carregamento de grandes volumes de dados.
+
+Visualização: Dashboards dinâmicos com Plotly e integração de mapas interativos.
