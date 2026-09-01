@@ -1,0 +1,56 @@
+# Painel de Inteligência Hospitalar — infraestrutura da v2
+#
+#   docker compose up -d db          # sobe só o banco (para dev local do ETL)
+#   docker compose run --rm etl      # roda o pipeline ETL uma vez
+#   docker compose up app            # sobe o dashboard em http://localhost:8501
+
+name: hospital-analytics
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hospital}
+      POSTGRES_USER: ${POSTGRES_USER:-hospital}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hospital}
+    ports:
+      - "5433:5432"          # publica em 5433 no host (5432 já em uso)
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hospital} -d ${POSTGRES_DB:-hospital}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  etl:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ["python", "-m", "etl.run_etl"]
+    environment:
+      DATABASE_URL: postgresql+pg8000://${POSTGRES_USER:-hospital}:${POSTGRES_PASSWORD:-hospital}@db:5432/${POSTGRES_DB:-hospital}
+      CSV_PATH: data/saude_processada.csv
+    volumes:
+      - ./data:/app/data:ro    # CSV montado, não copiado para a imagem
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ["streamlit", "run", "app/dashboard.py", "--server.address=0.0.0.0"]
+    environment:
+      DATABASE_URL: postgresql+pg8000://${POSTGRES_USER:-hospital}:${POSTGRES_PASSWORD:-hospital}@db:5432/${POSTGRES_DB:-hospital}
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./img:/app/img:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
