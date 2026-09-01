@@ -1,0 +1,14 @@
+# Núcleo de dados / ETL
+pandas>=2.2
+numpy>=1.26
+SQLAlchemy>=2.0
+pg8000>=1.31          # driver PostgreSQL puro-Python (sem libpq/DLL)
+python-dotenv>=1.0
+
+# Dashboard (v2)
+streamlit>=1.40
+streamlit-option-menu>=0.4
+plotly>=6.0
+wordcloud>=1.9
+matplotlib>=3.8
+Pillow>=10.0
