@@ -1,18 +1,95 @@
 # Painel de Inteligência Hospitalar
 
-Dashboard interativo desenvolvido em Python para análise de performance operacional e perfil demográfico. O sistema automatiza a transformação de dados brutos de atendimento em indicadores estratégicos (KPIs) para gestão de saúde.
+Dashboard em Python para análise operacional, demográfica e territorial de
+atendimentos hospitalares. Uma base bruta de ~550 mil registros é transformada
+por um pipeline ETL num banco **PostgreSQL** normalizado, que alimenta o painel
+em **Streamlit**.
 
-### O que o projeto faz:
-* **Análise Operacional:** Monitoramento de volume de atendimentos e identificação de picos sazonais em séries históricas.
-* **Gestão de Recursos:** Ranking de medicamentos mais prescritos e análise da proporção de serviços hospitalares utilizados.
-* **Inteligência Geográfica:** Mapeamento interativo de origem dos pacientes (via Folium) e análise de demanda por bairros.
-* **Frequência Clínica:** Processamento de linguagem natural (NLP) básico com Nuvem de Palavras para diagnósticos e queixas principais.
+![Painel — visão geral](docs/preview.png)
 
-### Tecnologias Utilizadas:
-* **Python:** Linguagem principal para processamento e lógica de negócio.
-* **Streamlit:** Framework utilizado para a criação da interface web e visualização dinâmica.
-* **Pandas/NumPy:** Manipulação eficiente de bases de dados e cálculos demográficos/estatísticos.
-* **Plotly/Folium:** Bibliotecas responsáveis pela geração de gráficos interativos e mapas geográficos.
+## O que o painel mostra
 
-### Como funciona:
-O script verifica e instala automaticamente todas as dependências necessárias no primeiro carregamento. Ele realiza a leitura de bases CSV, aplica filtros de data e faixa etária em tempo real e renderiza os dashboards de forma otimizada utilizando cache de memória para garantir performance.
+| Seção | Conteúdo |
+|---|---|
+| **Visão geral** | Volume mensal (série histórica e sazonalidade), tipos de ocorrência, perfil etário, proporção de serviços |
+| **Processos e recursos** | Medicamentos mais utilizados; nuvem de termos de queixas e diagnósticos |
+| **Território** | Demanda por bairro e por município de origem do paciente |
+
+## Arquitetura
+
+```mermaid
+flowchart LR
+    CSV[("saude_processada.csv<br/>~550k linhas")]
+    ETL["etl/<br/>extract · transform · load · validate"]
+    PG[("PostgreSQL<br/>schema normalizado + views")]
+    DB["app/db.py<br/>camada de acesso"]
+    UI["app/dashboard.py + app/ui.py<br/>Streamlit"]
+    CSV --> ETL --> PG --> DB --> UI
+```
+
+Responsabilidades separadas: `app/settings.py` (configuração por variável de
+ambiente), `app/db.py` (acesso a dados — só lê as views), `app/ui.py` (tema,
+CSS e helpers de gráfico), `app/dashboard.py` (composição das telas).
+
+## Como rodar
+
+### Docker Compose
+
+```bash
+cp .env.example .env
+docker compose up -d db          # PostgreSQL
+docker compose run --rm etl      # constrói o banco a partir do CSV
+docker compose up app            # http://localhost:8501
+```
+
+### Local
+
+```bash
+python -m venv .venv && . .venv/Scripts/activate     # ou: source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+docker compose up -d db
+python -m etl.run_etl
+streamlit run app/dashboard.py
+```
+
+## Estrutura
+
+```
+data/          saude_processada.csv        fonte (imutável)
+etl/           extract → transform → load → validate → run_etl
+db/            schema.sql · views.sql      DDL versionado
+app/           settings · db · ui · dashboard
+docker/        Dockerfile
+compose.yaml
+```
+
+## Stack
+
+Python · PostgreSQL 16 · SQLAlchemy + pg8000 · pandas · Streamlit · Plotly ·
+Docker Compose
+
+## Da v1 à v2
+
+A v1 foi meu primeiro projeto na faculdade (Tecnologia em Sistemas
+Inteligentes). A v2 é uma reconstrução com foco em arquitetura e
+reprodutibilidade.
+
+| Antes — v1 | Depois — v2 |
+|---|---|
+| Script único (~300 linhas), dados e interface no mesmo arquivo | Camadas: ETL, acesso a dados, configuração, apresentação |
+| Lê um CSV de ~100 MB a cada execução | PostgreSQL normalizado, com índices e views |
+| `pip install` dentro do `import` | `requirements.txt` + Docker Compose |
+| Idade calculada linha a linha (`.apply` em 550k linhas) | Cálculo vetorizado / em SQL |
+| Sem validação — data inválida quebrava o gráfico | Limpeza no ETL + checagens que travam a carga |
+| Parâmetros fixos no meio da lógica | `app/settings.py` por variável de ambiente |
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/v1.png" alt="v1"><br><sub><b>v1</b> — versão original</sub></td>
+    <td width="50%"><img src="docs/preview.png" alt="v2"><br><sub><b>v2</b> — reconstrução</sub></td>
+  </tr>
+</table>
+
+O código da v1 permanece no histórico do repositório. Desenvolvimento conduzido
+com abordagem *spec-driven* — especificação antes da implementação.
