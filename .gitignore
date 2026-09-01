@@ -1,11 +1,44 @@
+# Python
 __pycache__/
-*.pyc
-venv/
-.venv/
-.ipynb_checkpoints/
+*.py[cod]
 *.egg-info/
-.streamlit/
-streamlit_static/
 build/
 dist/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Ambiente virtual
+venv/
+.venv/
+
+# Streamlit (mantém o config.toml, ignora segredos)
+.streamlit/secrets.toml
+streamlit_static/
+
+# Documentação de especificação (local, fora do versionamento)
+.context/
+
+# Segredos / ambiente
+.env
+.env.local
+*.key
+
+# Logs e artefatos
 *.log
+*.pid
+
+# Banco local / dumps
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+*.dump
+
+# IDE / SO
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
