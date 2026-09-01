@@ -35,6 +35,10 @@ streamlit_static/
 pgdata/
 *.dump
 
+# Base de dados — distribuida via GitHub Releases, nao versionada
+data/*.csv
+!data/.gitkeep
+
 # IDE / SO
 .vscode/
 .idea/

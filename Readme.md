@@ -33,7 +33,17 @@ CSS e helpers de gráfico), `app/dashboard.py` (composição das telas).
 
 ## Como rodar
 
-### Docker Compose
+### 1. Baixar a base
+
+A base (`saude_processada.csv`, ~97 MB) não fica no repositório. Baixe pela
+[página de Releases](../../releases) e coloque em `data/`:
+
+```bash
+curl -L -o data/saude_processada.csv \
+  https://github.com/plfrancisco/hospital-data-analytics/releases/latest/download/saude_processada.csv
+```
+
+### 2a. Docker Compose
 
 ```bash
 cp .env.example .env
@@ -42,7 +52,7 @@ docker compose run --rm etl      # constrói o banco a partir do CSV
 docker compose up app            # http://localhost:8501
 ```
 
-### Local
+### 2b. Local
 
 ```bash
 python -m venv .venv && . .venv/Scripts/activate     # ou: source .venv/bin/activate
@@ -56,7 +66,7 @@ streamlit run app/dashboard.py
 ## Estrutura
 
 ```
-data/          saude_processada.csv        fonte (imutável)
+data/          saude_processada.csv        fonte (baixada dos Releases)
 etl/           extract → transform → load → validate → run_etl
 db/            schema.sql · views.sql      DDL versionado
 app/           settings · db · ui · dashboard
