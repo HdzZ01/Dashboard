@@ -1,0 +1,14 @@
+# Tema — dark sóbrio corporativo, acento teal.
+[theme]
+base = "dark"
+primaryColor = "#2db8a3"
+backgroundColor = "#0d1015"
+secondaryBackgroundColor = "#161a21"
+textColor = "#e8ebf1"
+font = "sans serif"
+
+[server]
+runOnSave = true
+
+[browser]
+gatherUsageStats = false
